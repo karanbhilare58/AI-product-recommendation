@@ -1,165 +1,240 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Product Discovery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered product recommendation engine — discover similar products instantly.">
+    <title>Product Discovery — AI Recommendations</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-            padding: 40px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            background: linear-gradient(90deg, #6366f1, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .controls {
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 12px;
-            display: flex;
-            gap: 10px;
-            max-width: 700px;
-            margin: auto;
-        }
-
-        select {
-            flex: 1;
-            padding: 12px;
-            background: #0f172a;
-            color: white;
-            border-radius: 8px;
-        }
-
-        button {
-            padding: 12px 20px;
-            background: #6366f1;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .card {
-            background: #1e293b;
-            margin: 10px;
-            padding: 10px;
-            width: 200px;
-            border-radius: 10px;
-        }
-
-        img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
+    <!-- Ambient glow -->
+    <div class="bg-glow"></div>
 
-    <h1>Product Discovery</h1>
-    <p>AI-powered recommendations</p>
+    <div class="container">
 
-    <div class="controls">
-        <select id="productSelect">
-            <option value="" disabled selected>Select a product</option>
+        <!-- Header -->
+        <header class="header">
+            <h1>Product Discovery</h1>
+            <p class="subtitle">AI-powered recommendations using cosine similarity</p>
+            <span class="badge">✦ Machine Learning</span>
+        </header>
 
-            {% for product in catalog %}
-            <option value="{{ product.product_id }}" data-name="{{ product.product_name }}"
-                data-category="{{ product.category }}" data-price="{{ product.price }}"
-                data-image="{{ product.image_url }}">
-                {{ product.product_name }}
-            </option>
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">{{ stats.total }}</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ stats.categories }}</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">AI</div>
+                <div class="stat-label">Powered</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <select id="productSelect">
+                <option value="" disabled selected>🔍 Select a product…</option>
+                {% for product in catalog %}
+                <option value="{{ product.product_id }}"
+                    data-name="{{ product.product_name }}"
+                    data-category="{{ product.category }}"
+                    data-price="{{ product.price }}"
+                    data-image="{{ product.image_url }}">
+                    {{ product.product_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button class="btn-primary" onclick="getRec()">Find Similar</button>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="filter-bar">
+            <span class="chip active" onclick="filterCatalog('all')">All</span>
+            {% for cat in categories %}
+            <span class="chip" onclick="filterCatalog('{{ cat }}')">{{ cat }}</span>
             {% endfor %}
-        </select>
+        </div>
 
-        <button onclick="getRec()">Find Similar Items</button>
+        <!-- Selected Product -->
+        <h2 class="section-title" id="selectedTitle">
+            <span class="icon">⭐</span> Selected Product <span class="line"></span>
+        </h2>
+        <div id="selectedProduct"></div>
+
+        <!-- Recommendations -->
+        <h2 class="section-title" id="recTitle">
+            <span class="icon">✨</span> You Might Also Like <span class="line"></span>
+        </h2>
+
+        <!-- Loader -->
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p>Finding similar products…</p>
+        </div>
+
+        <div class="grid" id="results"></div>
+
+        <!-- Catalog Browse -->
+        <div class="catalog-section">
+            <div class="section-header">
+                <h2>Browse Catalog</h2>
+                <span class="count" id="catalogCount">{{ stats.total }} items</span>
+            </div>
+            <div class="grid" id="catalogGrid">
+                {% for product in catalog %}
+                <div class="card catalog-card" data-category="{{ product.category }}"
+                    style="animation-delay: {{ loop.index0 * 0.06 }}s">
+                    <div class="img-wrap">
+                        <img src="{{ product.image_url }}" alt="{{ product.product_name }}"
+                            loading="lazy"
+                            onerror="this.src='https://via.placeholder.com/400x300/1e293b/64748b?text=No+Image'">
+                        <span class="category-tag tag-{{ product.category | lower }}">{{ product.category }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>{{ product.product_name }}</h4>
+                        <div class="card-meta">
+                            <span class="price">₹{{ product.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <!-- Selected Product -->
-    <h2 id="selectedTitle" style="display:none;">Selected Product</h2>
-    <div id="selectedProduct" class="grid"></div>
-
-    <!-- Recommendations -->
-    <h2 id="recTitle" style="display:none;">You Might Also Like</h2>
-    <div id="results" class="grid"></div>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
     <script>
+        // --- Toast notification ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // --- Category tag class helper ---
+        function tagClass(cat) {
+            const c = cat.toLowerCase();
+            if (c === 'electronics') return 'tag-electronics';
+            if (c === 'footwear') return 'tag-footwear';
+            if (c === 'fitness') return 'tag-fitness';
+            return 'tag-electronics';
+        }
+
+        // --- Filter catalog chips ---
+        function filterCatalog(category) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.catalog-card');
+            let count = 0;
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = '';
+                    count++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('catalogCount').textContent = count + ' items';
+        }
+
+        // --- Get recommendations ---
         function getRec() {
-            let select = document.getElementById("productSelect");
-            let id = select.value;
+            const select = document.getElementById('productSelect');
+            const id = select.value;
 
             if (!id) {
-                alert("Select a product first");
+                showToast('⚠ Please select a product first');
                 return;
             }
 
-            let option = select.options[select.selectedIndex];
+            const option = select.options[select.selectedIndex];
+            const name = option.dataset.name;
+            const category = option.dataset.category;
+            const price = option.dataset.price;
+            const image = option.dataset.image;
 
-            let name = option.getAttribute("data-name");
-            let category = option.getAttribute("data-category");
-            let price = option.getAttribute("data-price");
-            let image = option.getAttribute("data-image");
+            // Show selected product as featured card
+            document.getElementById('selectedTitle').classList.add('visible');
+            document.getElementById('selectedProduct').innerHTML = `
+                <div class="featured-card">
+                    <div class="featured-img">
+                        <img src="${image}" alt="${name}"
+                             onerror="this.src='https://via.placeholder.com/400x300/1e293b/64748b?text=No+Image'">
+                    </div>
+                    <div class="featured-info">
+                        <span class="category-tag ${tagClass(category)}">${category}</span>
+                        <h3>${name}</h3>
+                        <span class="price">₹${Number(price).toLocaleString('en-IN')}</span>
+                    </div>
+                </div>
+            `;
 
-            // Show selected product
-            document.getElementById("selectedTitle").style.display = "block";
-            document.getElementById("selectedProduct").innerHTML = `
-        <div class="card">
-            <img src="${image}" 
-                 onerror="this.src='https://via.placeholder.com/300'">
-            <h4>${name}</h4>
-            <p>${category}</p>
-            <p>₹${price}</p>
-        </div>
-    `;
+            // Show loader, hide old results
+            const loader = document.getElementById('loader');
+            const container = document.getElementById('results');
+            loader.classList.add('active');
+            container.innerHTML = '';
+            document.getElementById('recTitle').classList.remove('visible');
 
-            // Fetch recommendations
+            // Fetch
             fetch(`/recommend/${id}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Server error');
+                    return res.json();
+                })
                 .then(data => {
-                    let container = document.getElementById("results");
-                    container.innerHTML = "";
+                    loader.classList.remove('active');
 
                     if (data.error) {
-                        container.innerHTML = data.error;
+                        showToast('❌ ' + data.error);
                         return;
                     }
 
-                    document.getElementById("recTitle").style.display = "block";
+                    document.getElementById('recTitle').classList.add('visible');
 
-                    data.recommendations.forEach(p => {
+                    data.recommendations.forEach((p, i) => {
                         container.innerHTML += `
-                <div class="card">
-                    <img src="${p.image_url}" 
-                         onerror="this.src='https://via.placeholder.com/300'">
-                    <h4>${p.product_name}</h4>
-                    <p>${p.category}</p>
-                    <p>₹${p.price}</p>
-                </div>
-            `;
+                            <div class="card" style="animation-delay: ${i * 0.1}s">
+                                <div class="img-wrap">
+                                    <img src="${p.image_url}" alt="${p.product_name}"
+                                         onerror="this.src='https://via.placeholder.com/400x300/1e293b/64748b?text=No+Image'">
+                                    <span class="category-tag ${tagClass(p.category)}">${p.category}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h4>${p.product_name}</h4>
+                                    <div class="card-meta">
+                                        <span class="price">₹${Number(p.price).toLocaleString('en-IN')}</span>
+                                        ${p.similarity ? `<span class="similarity">${(p.similarity * 100).toFixed(0)}% match</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     });
+                })
+                .catch(err => {
+                    loader.classList.remove('active');
+                    showToast('❌ Failed to fetch recommendations');
+                    console.error(err);
                 });
         }
     </script>
-
 </body>
 
 </html>

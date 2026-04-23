@@ -1,0 +1,14 @@
+user_id,product_id,product_name,category,price,image_url
+1,101,Wireless Mouse,Electronics,999,https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&q=80
+2,102,Bluetooth Keyboard,Electronics,1999,https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80
+3,103,Running Shoes,Footwear,2999,https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80
+4,104,Yoga Mat,Fitness,799,https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&q=80
+5,105,Noise Cancelling Headphones,Electronics,4999,https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600&q=80
+6,106,Dumbbell Set,Fitness,1499,https://images.unsplash.com/photo-1586401100295-7a8096fd231a?w=600&q=80
+7,107,Smart Watch,Electronics,3999,https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=600&q=80
+8,108,Trail Running Shoes,Footwear,3499,https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80
+9,109,Resistance Bands,Fitness,499,https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&q=80
+10,110,USB-C Hub,Electronics,1299,https://images.unsplash.com/photo-1600329065039-445eebacafbf?w=600&q=80
+11,111,Water Bottle,Fitness,299,https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=80
+12,112,Casual Sneakers,Footwear,1599,https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600&q=80
+13,113,Basketball Shoes,Footwear,4599,https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&q=80
